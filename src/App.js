@@ -1,5 +1,6 @@
 import { Application } from "pixi.js";
 import { GameScene } from "./GameScene.js";
+import { PreloadScene } from "./PreloadScene.js";
 
 class Game
 {
@@ -12,12 +13,18 @@ class Game
         });
 
         this.scenes = [];
-        this.scenes.push(new GameScene(this.app))
+        this.scenes.push(new GameScene(this.app));
+        this.scenes.push(new PreloadScene(this.app));
 
         window.addEventListener("resize", () => this.scenes.forEach(scene => scene.resize()));
     }
 
-    start() { }
+    start()
+    {
+        this.app.ticker.add(delta => {
+            this.scenes.forEach(scene => scene.update(delta.deltaTime));
+        });
+    }
 }
 // const app = new Application();
 // await app.init({ backgroundColor: 0x1099bb, resizeTo: window });
