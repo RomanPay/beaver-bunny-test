@@ -2,6 +2,8 @@ import { Application } from "pixi.js";
 import { GameScene } from "./GameScene.js";
 import { PreloadScene } from "./PreloadScene.js";
 
+export const Scenes = [];
+
 class Game
 {
     constructor()
@@ -9,20 +11,17 @@ class Game
         this.app = new Application();
         this.app.init({ backgroundColor: 0xFF0FF, width: 1920, height: 1080 }).then(() => {
             document.querySelector("#app").appendChild(this.app.canvas);
+            Scenes.push(new PreloadScene(this.app));
             this.start();
         });
 
-        this.scenes = [];
-        this.scenes.push(new GameScene(this.app));
-        this.scenes.push(new PreloadScene(this.app));
-
-        window.addEventListener("resize", () => this.scenes.forEach(scene => scene.resize()));
+        window.addEventListener("resize", () => Scenes.forEach(scene => scene.resize()));
     }
 
     start()
     {
         this.app.ticker.add(delta => {
-            this.scenes.forEach(scene => scene.update(delta.deltaTime));
+            Scenes.forEach(scene => scene.update(delta.deltaTime));
         });
     }
 }

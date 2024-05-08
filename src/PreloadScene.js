@@ -1,5 +1,10 @@
-import Scene from "./Scene"
-import { readdir } from 'fs/promises'
+import { Assets, Sprite } from "pixi.js";
+import Scene from "./Scene";
+import { ImageKeys } from "./imagesKeys.js";
+import { Scenes } from "./App.js";
+import { GameScene } from "./GameScene.js";
+
+export const ImagesBundle = { };
 
 export class PreloadScene extends Scene
 {
@@ -11,20 +16,10 @@ export class PreloadScene extends Scene
         this.resize();
     }
 
-    init()
+    async init()
     {
-        this.getDirs();
-    }
-
-    getDirs()
-    {
-        const getDirectories = async source =>
-            (await readdir(source, { withFileTypes: true }))
-              .filter(dirent => dirent.isDirectory())
-              .map(dirent => dirent.name)
-
-        const dirPath = '/path/to/directory';
-        const dirs = getDirectories(dirPath);
-        console.log(dirs);
+        Assets.addBundle("images", ImageKeys);
+        ImagesBundle.OrdinaryImages = await Assets.loadBundle("images");
+        Scenes.push(new GameScene(this.app));
     }
 }

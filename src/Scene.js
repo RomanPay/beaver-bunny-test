@@ -10,9 +10,10 @@ export default class Scene extends Container
     constructor(name, app)
     {
         super();
+        app.stage.addChild(this);
+
         this.name = name;
         this.app = app;
-        app.stage.addChild(this);
     }
 
     init()
@@ -30,7 +31,10 @@ export default class Scene extends Container
                     Math.min(width / ScreenSize.width, height / ScreenSize.height);
         this.scale.set(scale);
 
-        this.position.set(width * 0.5 - ScreenSize.width * scale, height * 0.5 - ScreenSize.height * scale);
+        const x = width * 0.5 - (ScreenSize.width * 0.5) * scale;
+        const y = height * 0.5 - (ScreenSize.height * 0.5) * scale;
+
+        this.position.set(x, y);
     }
 
     update(deltaTime)
