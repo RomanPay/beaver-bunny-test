@@ -9,13 +9,14 @@ class Game
     constructor()
     {
         this.app = new Application();
-        this.app.init({ backgroundColor: 0xFF0FF, width: 1920, height: 1080 }).then(() => {
+        this.app.init({ backgroundColor: 0x000000, width: 2100, height: 1030 }).then(() => {
             document.querySelector("#app").appendChild(this.app.canvas);
             Scenes.push(new PreloadScene(this.app));
             this.start();
         });
 
-        window.addEventListener("resize", () => Scenes.forEach(scene => scene.resize()));
+        window.addEventListener("resize", () => { this.resize(); });
+        setTimeout(() => this.resize(), 100);
     }
 
     start()
@@ -24,7 +25,16 @@ class Game
             Scenes.forEach(scene => scene.update(delta.deltaTime));
         });
     }
+
+    resize()
+    {
+        Scenes.forEach(scene => {
+            scene.resize();
+        });
+        this.app.renderer.resize(window.innerWidth, window.innerHeight);
+    }
 }
+
 // const app = new Application();
 // await app.init({ backgroundColor: 0x1099bb, resizeTo: window });
 // document.body.appendChild(app.canvas);

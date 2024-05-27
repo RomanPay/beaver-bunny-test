@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 export const ScreenSize = {
     width: 1030,
@@ -35,6 +35,14 @@ export default class Scene extends Container
         const y = height * 0.5 - (ScreenSize.height * 0.5) * scale;
 
         this.position.set(x, y);
+    }
+
+    drawBounds(color)
+    {
+        const g = new Graphics();
+        g.rect(0, 0, ScreenSize.width, ScreenSize.height);
+        g.stroke({ width: 10, color: color });
+        this.addChild(g);
     }
 
     update(deltaTime)

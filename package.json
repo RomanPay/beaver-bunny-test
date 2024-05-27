@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "assets": "node ./src/readFiles.js "
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "css-loader": "^7.1.1",
+    "nanoid": "^5.0.7",
     "pixi.js": "^8.1.1",
     "style-loader": "^4.0.0"
   }
