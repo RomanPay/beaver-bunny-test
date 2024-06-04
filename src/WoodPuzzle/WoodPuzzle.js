@@ -1,8 +1,9 @@
-import { Graphics } from "pixi.js";
+import { ScreenSize } from "../Scene";
+import { Container, Graphics } from "pixi.js";
+import Entity from "./Entity";
 import InteractiveComponent from "./Components/InteractiveComponent";
 import PositionComponent from "./Components/PositionComponent";
 import SpriteComponent from "./Components/SpriteComponent";
-import Entity from "./Entity";
 import HoverSystem from "./Systems/HoverSystem";
 import RenderSystem from "./Systems/RenderSystem";
 
@@ -18,15 +19,16 @@ export class WoodPuzzle
 
     initEntities()
     {
+        this.entities = [];
         this.initField();
         this.initHUD();
     }
 
     initHUD()
     {
-        const scaleHUDTiles = 2;
-        const ofssetHUDX = 270;
-        const ofssetHUDY = 600;
+        const scaleHUDTiles = 4;
+        const ofssetHUDX = 150;
+        const ofssetHUDY = 700;
 
         for (let i = 0; i < 3; i++)
         {
@@ -34,9 +36,10 @@ export class WoodPuzzle
             const spriteComponent = new SpriteComponent("Wood_64x64", this.scene);
             spriteComponent.sprite.scale.set(scaleHUDTiles);
             hudTile.addComponent(spriteComponent);
-            spriteComponent.sprite.entity = hudTile;
             
             hudTile.addComponent(new PositionComponent(ofssetHUDX + i * scaleHUDTiles * 64, ofssetHUDY));
+
+            this.entities.push(hudTile);
         }
         
         const g = new Graphics();
@@ -52,37 +55,44 @@ export class WoodPuzzle
     initField()
     {
         const tileSize = 64;
+        const cellScale = 1.11;
+        const fieldX = 6;
+        
+        this.fieldContainer = new Container();
+        this.scene.addChild(this.fieldContainer);
 
         for (let i = 0; i < 81; i++)
         {
             const cell = new Entity();
-            const spriteComponent = new SpriteComponent("Wood_64x64", this.scene);
+            const spriteComponent = new SpriteComponent("Wood_64x64", this.fieldContainer);
+            spriteComponent.sprite.scale.set(cellScale);
             cell.addComponent(spriteComponent);
-            spriteComponent.sprite.entity = cell;
 
-            cell.addComponent(new PositionComponent(170 + (i % 9) * (tileSize), (Math.floor(i / 9)) * (tileSize)));
+            cell.addComponent(new PositionComponent(fieldX + (i % 9) * (tileSize * cellScale), (Math.floor(i / 9)) * (tileSize * cellScale)));
             cell.addComponent(new InteractiveComponent("Wood_64x64", "Wheat"))
+
+            this.entities.push(cell);
         }
 
         const g = new Graphics()
-        this.scene.addChild(g);
+        this.fieldContainer.addChild(g);
         
-        g.rect(170, 0, 9 * (tileSize), 9 * (tileSize));
+        g.rect(fieldX, 0, 9 * (tileSize * cellScale), 9 * (tileSize * cellScale));
         g.stroke({ width: 5, color: 0xFFFFFF });
 
         let lineWidth = 2;
         let alpha = 0.7;
         for (let i = 1; i < 9; i++)
         {
-            lineWidth = i % 3 === 0 ? 5 : 2;
+            lineWidth = i % 3 === 0 ? 5 : 3;
             alpha = i % 3 === 0 ? 0.7 : 0.5;
 
-            g.moveTo(170 + i * (tileSize), 0, 0);
-            g.lineTo(170 + i * (tileSize), 9 * (tileSize));
+            g.moveTo(fieldX + i * (tileSize * cellScale), 0, 0);
+            g.lineTo(fieldX + i * (tileSize * cellScale), 9 * (tileSize * cellScale));
             g.stroke({ width: lineWidth, color: 0xFFFFFF, alpha: alpha });        
             
-            g.moveTo(170, i * (tileSize));
-            g.lineTo(170 + 9 * (tileSize), i * (tileSize));
+            g.moveTo(fieldX, i * (tileSize * cellScale));
+            g.lineTo(fieldX + 9 * (tileSize * cellScale), i * (tileSize * cellScale));
             g.stroke({ width: lineWidth, color: 0xFFFFFF, alpha: alpha });
         }
     }
@@ -90,13 +100,29 @@ export class WoodPuzzle
     initSystems()
     {
         this.systems = [
-            new RenderSystem(this.scene),
-            new HoverSystem(this.scene)
+            new RenderSystem(this),
+            new HoverSystem(this, this.scene)
         ];
     }
 
     update(deltaTime)
     {
        this.systems.forEach(system => system.update());
+    }
+
+    resize()
+    {
+        // const width = document.documentElement.clientWidth;
+        // const height = document.documentElement.clientHeight;
+
+        // const scale = width > height ?
+                    // Math.min(height / ScreenSize.height, width / ScreenSize.width) :
+                    // Math.min(height / ScreenSize.width, width / ScreenSize.height);
+        // this.fieldContainer.scale.set(scale);
+
+        // const x = width * 0.5 - (ScreenSize.width * 0.5) * scale;
+        // const y = height * 0.5 - (ScreenSize.height * 0.5) * scale;
+
+        // this.fieldContainer.position.set(this.fieldContainer.x - x, y);
     }
 }

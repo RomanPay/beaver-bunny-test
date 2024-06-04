@@ -23,12 +23,18 @@ export default class Scene extends Container
 
     resize()
     {
-        const width = document.documentElement.clientWidth;
-        const height = document.documentElement.clientHeight;
+        // const width = document.documentElement.clientWidth;
+        // const height = document.documentElement.clientHeight;
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+
+        console.log(`width ${ width }, height ${ height }`);
 
         const scale = width > height ?
                     Math.min(height / ScreenSize.height, width / ScreenSize.width) :
-                    Math.min(width / ScreenSize.width, height / ScreenSize.height);
+                    Math.min(height / ScreenSize.width, width / ScreenSize.height);
         this.scale.set(scale);
 
         const x = width * 0.5 - (ScreenSize.width * 0.5) * scale;
@@ -47,6 +53,6 @@ export default class Scene extends Container
 
     update(deltaTime)
     {
-
+        
     }
 }

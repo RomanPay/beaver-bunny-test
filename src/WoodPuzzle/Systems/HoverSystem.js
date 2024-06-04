@@ -4,8 +4,9 @@ import SpriteComponent from "../Components/SpriteComponent";
 
 export default class HoverSystem
 {
-    constructor(scene)
+    constructor(puzzle, scene)
     {
+        this.puzzle = puzzle;
         this.scene = scene;
         this.scene.interactive = true;
         this.scene.on('pointermove', event => this.onPointerMove(event));
@@ -15,18 +16,17 @@ export default class HoverSystem
     onPointerMove(event)
     {
         const point = event.data.global;
-        this.scene.children.forEach(children => {
-            if (children.entity && children.entity.getComponent(InteractiveComponent))
+        this.puzzle.entities.forEach(entity => {
+            if (entity && entity.getComponent(InteractiveComponent))
             {
-                const bounds = children.getBounds();
-                const interactive = children.entity.getComponent(InteractiveComponent);
+                const bounds = entity.getComponent(SpriteComponent).sprite.getBounds();
+                const interactive = entity.getComponent(InteractiveComponent);
                 if (bounds.rectangle.contains(point.x, point.y))
                 {
                     if (!interactive.isHovered)
                     {
                         interactive.isHovered = true;
-                        children.entity.getComponent(SpriteComponent).sprite.tint = 0x646464;
-                        // children.texture = Texture.from(interactive.hoverTextureKey);
+                        entity.getComponent(SpriteComponent).sprite.tint = 0x646464;
                     }
                 }
                 else
@@ -34,8 +34,7 @@ export default class HoverSystem
                     if (interactive.isHovered)
                     {
                         interactive.isHovered = false;
-                        children.entity.getComponent(SpriteComponent).sprite.tint = 0xFFFFFF;
-                        // children.texture = Texture.from(interactive.normalTextureKey);
+                        entity.getComponent(SpriteComponent).sprite.tint = 0xFFFFFF;
                     }
                 }
             }
@@ -45,14 +44,14 @@ export default class HoverSystem
     onPointerOut(event)
     {
         const point = event.data.global;
-        this.scene.children.forEach(children => {
-            if (children.entity && children.entity.getComponent(InteractiveComponent))
+        this.puzzle.entities.forEach(entity => {
+            if (entity && entity.getComponent(InteractiveComponent))
             {
-                const interactive = children.entity.getComponent(InteractiveComponent);
+                const interactive = entity.getComponent(InteractiveComponent);
                 if (interactive.isHovered)
                 {
                     interactive.isHovered = false;
-                    children.entity.getComponent(SpriteComponent).sprite.tint = 0xFFFFFF;
+                    entity.getComponent(SpriteComponent).sprite.tint = 0xFFFFFF;
                 }
             }
         });

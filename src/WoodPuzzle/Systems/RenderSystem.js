@@ -3,18 +3,18 @@ import SpriteComponent from "../Components/SpriteComponent";
 
 export default class RenderSystem
 {
-    constructor(scene)
+    constructor(puzzle)
     {
-        this.scene = scene; 
+        this.puzzle = puzzle; 
     }
   
     update(deltaTime)
     {
-        this.scene.children.forEach(children => {
-            if (children.entity && children.entity.getComponent(SpriteComponent))
+        this.puzzle.entities.forEach(entity => {
+            if (entity && entity.getComponent(SpriteComponent))
             {
-                let position = children.entity.getComponent(PositionComponent);
-                let sprite = children.entity.getComponent(SpriteComponent).sprite;
+                let position = entity.getComponent(PositionComponent);
+                let sprite = entity.getComponent(SpriteComponent).sprite;
                 sprite.x = position.x;
                 sprite.y = position.y;
             }
