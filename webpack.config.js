@@ -11,7 +11,7 @@ module.exports = (env, argv) => {
     devtool: 'inline-source-map',
     entry: './src/index.js',
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'docs'),
       filename: 'bundle.js'
     },
     plugins: [
@@ -65,7 +65,7 @@ module.exports = (env, argv) => {
       ]
     },
     devServer: {
-      static: path.join(__dirname, 'dist'),
+      static: path.join(__dirname, 'docs'),
       hot: true,
       open: true,
       watchFiles: ['src/**'],

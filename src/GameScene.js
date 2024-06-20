@@ -325,7 +325,7 @@ export class GameScene extends Scene
         
         // const x = width * 0.5 - (ScreenSize.Width * 0.5) * scale;
         let x = 0;
-        const y = height - ScreenSize.Height * scale - 100; 
+        const y = height - ScreenSize.Height * scale - 50; 
         
         this.position.set(x, y);
     }
