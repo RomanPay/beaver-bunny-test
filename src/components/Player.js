@@ -32,6 +32,8 @@ export class Player extends Container
 
         this.currentState = PlayerState.OnAir;
         this.isUpdate = true;
+
+        this.lastLoop = new Date();
     }
 
     onStart()
@@ -51,7 +53,8 @@ export class Player extends Container
         switch (this.currentState)
         {
             case PlayerState.Jump :
-                this.weight = -15.5;
+                // gsap.to(this, { y: this.y -= 400, duration: 0.6 });
+                this.weight = -22.5;
                 this.gravity = 0;
                 break;
             case PlayerState.Crush :
