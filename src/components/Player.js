@@ -36,7 +36,9 @@ export class Player extends Container
 
     onStart()
     {
-        
+        this.position.y = this.lowBorder;
+        this.isUpdate = false;
+        this.setState(PlayerState.OnAir);
     }
 
     setState(state)
