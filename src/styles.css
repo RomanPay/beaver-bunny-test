@@ -2,3 +2,10 @@ body {
     margin: 0;
     overflow: hidden;
 }
+
+@font-face {
+    font-family: 'ZubiloBlack';
+    src: url('./assets/fonts/ZubiloBlack.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}

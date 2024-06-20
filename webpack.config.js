@@ -18,7 +18,7 @@ module.exports = (env, argv) => {
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         title: 'PixiTempalte',
-        template: 'src/index.html'
+        template: 'src/index.html',
       }),
       new CopyWebpackPlugin({
         patterns: [
@@ -50,10 +50,22 @@ module.exports = (env, argv) => {
             },
           ],
         },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          use: [
+              {
+                  loader: 'file-loader',
+                  options: {
+                      name: '[name].[ext]',
+                      outputPath: 'assets/fonts',
+                  },
+              },
+          ],
+      },
       ]
     },
     devServer: {
-      static: './dist',
+      static: path.join(__dirname, 'dist'),
       hot: true,
       open: true,
       watchFiles: ['src/**'],

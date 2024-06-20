@@ -1,3 +1,5 @@
 {
-    "CodeGPT.apiKey": "Nvidia"
+    "CodeGPT.apiKey": "Nvidia",
+    "search.useGlobalIgnoreFiles": false,
+    "search.useIgnoreFiles": true
 }

@@ -27,8 +27,9 @@ export class WoodPuzzle
     initHUD()
     {
         const scaleHUDTiles = 4;
-        const ofssetHUDX = 150;
-        const ofssetHUDY = 700;
+        // const ofssetHUDX = ScreenSize.Width * 0.5 - ((3 * 0.5) * (64 * scaleHUDTiles));
+        const ofssetHUDX = 0;
+        const ofssetHUDY = 0;
 
         for (let i = 0; i < 3; i++)
         {
@@ -54,9 +55,14 @@ export class WoodPuzzle
 
     initField()
     {
+        const fiieldsRows = 9;
+        const fiieldsCols = 9;
         const tileSize = 64;
-        const cellScale = 1.11;
-        const fieldX = 6;
+        const cellScale = 1.5;
+        
+        const fieldX = ScreenSize.Width * 0.5 - ((fiieldsCols * 0.5) * (tileSize * cellScale));
+        // const fieldX = 0;
+        const fieldY = ScreenSize.Height * 0;
         
         this.fieldContainer = new Container();
         this.scene.addChild(this.fieldContainer);
@@ -68,7 +74,7 @@ export class WoodPuzzle
             spriteComponent.sprite.scale.set(cellScale);
             cell.addComponent(spriteComponent);
 
-            cell.addComponent(new PositionComponent(fieldX + (i % 9) * (tileSize * cellScale), (Math.floor(i / 9)) * (tileSize * cellScale)));
+            cell.addComponent(new PositionComponent(fieldX + (i % 9) * (tileSize * cellScale), fieldY + (Math.floor(i / 9)) * (tileSize * cellScale)));
             cell.addComponent(new InteractiveComponent("Wood_64x64", "Wheat"))
 
             this.entities.push(cell);

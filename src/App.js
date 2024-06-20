@@ -9,21 +9,13 @@ class Game
     constructor()
     {
         this.app = new Application();
-        this.app.init({ backgroundColor: 0x000000, width: 2100, height: 1030 }).then(() => {
-            document.querySelector("#app").appendChild(this.app.canvas);
+        this.app.init({ backgroundColor: 0x000000, width: 3200, height: 3200 }).then(() => {
+            document.querySelector("#pixi-wrapper").appendChild(this.app.canvas);
             Scenes.push(new PreloadScene(this.app));
-            this.start();
         });
 
         window.addEventListener("resize", () => { this.resize(); });
         setTimeout(() => this.resize(), 100);
-    }
-
-    start()
-    {
-        this.app.ticker.add(delta => {
-            Scenes.forEach(scene => scene.update(delta.deltaTime));
-        });
     }
 
     resize()
