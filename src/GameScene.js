@@ -16,7 +16,7 @@ const START_SLOPE_Y_OFFSET = 314;
 const GROUND_HEIGHT = 414;
 const MOUNTAINS_HEIGHT = 770;
 const TREE_PROBABILITY = 0.005;
-const OBSTACLE_PROBABILITY = 0.002;
+const OBSTACLE_PROBABILITY = 0.004;
 
 export class GameScene extends Scene
 {

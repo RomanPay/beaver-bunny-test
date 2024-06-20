@@ -3,112 +3,93 @@ import { ScreenSize } from "../Scene";
 import { Button } from "./Button";
 import { LeaderboardPlate } from "./LeadeboardPlate";
 
+const CENTER_X = ScreenSize.Width * 0.5;
+const CENTER_Y = ScreenSize.Height * 0.5;
+const PERIOD_TEXT_STYLE = {
+    fontFamily: "ZubiloBlack",
+    fontSize: 60,
+    fill: 0xFF0000,
+    align: "center",
+    dropShadow: {
+        alpha: 0.8,
+        angle: Math.PI / 2,
+        color: '0x414141',
+        distance: 5
+    }
+};
+const TEXT_CONFIGS = [
+    { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x00FF00 },
+    { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x0000FF },
+    { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x0FFF00 },
+    { fontFamily: "ZubiloBlack", fontSize: 40, fill: 0x000000 }
+];
+const NAME_PLATE_KEYS = ["place_1", "place_2", "place_3", "midleader_name_plate"];
+const SCORE_PLATE_KEYS = ["highleader_scores_plate", "highleader_scores_plate", "highleader_scores_plate", "midleader_scores_plate"];
+const OFFSET_Y_VALUES = [81, 81, 68, 46];
+const OFFSET_X_VALUES = [90, 90, 90, 60];
+
 export class LeadersLists
 {
     constructor(parent)
     {
         this.parent = parent;
+        this.center = { x: CENTER_X, y: CENTER_Y };
+        this.currentListsIndex = 0;
 
-        this.center = { x: ScreenSize.Width * 0.5, y: ScreenSize.Height * 0.5};
-        
-        this.timePeriodText = new Text({
-            text: "All time", 
-            style: {
-                fontFamily: "ZubiloBlack",
-                fontSize: 60,
-                fill: 0xFF0000,
-                align: "center",
-                dropShadow: {
-                    alpha: 0.8,
-                    angle: Math.PI / 2,
-                    color: '0x414141',
-                    distance: 5
-                },
-            }
-        });
+        this.initText();
+        this.initButtons();
+        this.leadersListsProcessing();
+        this.initLeaderboardLists();
+    }
+
+    initText()
+    {
+        this.timePeriodText = new Text("All time", PERIOD_TEXT_STYLE);
         this.timePeriodText.position.set(this.center.x, this.center.y - 310);
         this.timePeriodText.anchor.set(0.5, 0.5);
         this.parent.addChild(this.timePeriodText);
-        
-        this.leftArrow = new Button(this.parent, "arrow_btn", () => { this.showLeaders(-1); }, this.center.x - 270, this.center.y - 310);
-        this.leftArrow.scale.set(-1, 1);
-        this.rightArrow = new Button(this.parent, "arrow_btn", () => { this.showLeaders(1); }, this.center.x + 270, this.center.y - 310);
-        this.okButton = new Button(this.parent, "ok_button", () => { }, this.center.x, this.center.y + 370);
+    }
 
-        this.leadersListsProcessing();
-        this.initLeaderboardLists();
+    initButtons()
+    {
+        this.leftArrow = new Button(this.parent, "arrow_btn", () => this.showLeaders(-1), this.center.x - 270, this.center.y - 310);
+        this.leftArrow.scale.set(-1, 1);
+        this.rightArrow = new Button(this.parent, "arrow_btn", () => this.showLeaders(1), this.center.x + 270, this.center.y - 310);
+        this.okButton = new Button(this.parent, "ok_button", () => { }, this.center.x, this.center.y + 370);
     }
 
     leadersListsProcessing()
     {
         this.lists = [
-            list.allTime.sort( (a, b) => a.place - b.place),
-            list.montly.sort( (a, b) => a.place - b.place),
-            list.weekly.sort( (a, b) => a.place - b.place)
+            list.allTime.sort((a, b) => a.place - b.place),
+            list.monthly.sort((a, b) => a.place - b.place),
+            list.weekly.sort((a, b) => a.place - b.place)
         ];
-
-        this.currentListsIndex = 0;
     }
 
     initLeaderboardLists()
     {
         this.leadersPlates = [];
-
         let startY = this.center.y - 230;
-        let offsetY = 50;
-        let offsetX = 60;
-        let namePlateKey = "midleader_name_plate";
-        let scorePlateKey = "midleader_scores_plate";
 
-        let textConfig = {
-            fontFamily: "ZubiloBlack",
-            fontSize: 40,
-            fill: 0x000000
-        }
-
-        for (let i = 1; i < 11; i++)
+        for (let i = 0; i < 10; i++)
         {
+            const textConfig = TEXT_CONFIGS[Math.min(i, 3)];
+            const namePlateKey = NAME_PLATE_KEYS[Math.min(i, 3)];
+            const scorePlateKey = SCORE_PLATE_KEYS[Math.min(i, 3)];
+            const offsetY = OFFSET_Y_VALUES[Math.min(i, 3)];
+            const offsetX = OFFSET_X_VALUES[Math.min(i, 3)];
 
-            if (i === 1)
-                textConfig = { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x00FF00 };
-            else if (i === 2)
-                textConfig = { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x0000FF };
-            else if (i === 3)
-                textConfig = { fontFamily: "ZubiloBlack", fontSize: 50, fill: 0x0FFF00 };
-            else
-                textConfig = { fontFamily: "ZubiloBlack", fontSize: 40, fill: 0x000000 };
-                
-
-            if (i < 4)
-            {
-                namePlateKey = "place_" + i;
-                scorePlateKey = "highleader_scores_plate";
-                offsetY = 81;
-                offsetX = 90;
-            }
-            else
-            {
-                namePlateKey = "midleader_name_plate";
-                scorePlateKey = "midleader_scores_plate";
-                offsetY = 46;
-                offsetX = 60;
-            }
-            if (i === 3)
-                offsetY = 68;
             const plate = new LeaderboardPlate(
-                this.parent, namePlateKey, scorePlateKey, 
-                this.center.x - offsetX, startY, this.center.x + 260, startY, 
+                this.parent, namePlateKey, scorePlateKey,
+                this.center.x - offsetX, startY, this.center.x + 260, startY,
                 textConfig
             );
 
-            if (i < 4)
-            {
-                plate.nameText.x += 30;
-            }
-            else
+            if (i >= 3)
             {
                 const placeText = new Text({
-                    text: i.toFixed(0), 
+                    text: i + 1,
                     style: {
                         fontFamily: "ZubiloBlack",
                         fontSize: 40,
@@ -120,42 +101,40 @@ export class LeadersLists
                 placeText.position.set(this.center.x - 305, startY - 3);
                 plate.addChild(placeText);
             }
+            else
+            {
+                plate.nameText.x += 30;
+            }
 
             startY += offsetY;
-
             this.leadersPlates.push(plate);
         }
     }
 
     disableInteractive()
     {
-        this.okButton.interactive = false;
-        this.leftArrow.interactive = false;
-        this.rightArrow.interactive = false;
+        this.setInteractive(false);
     }
 
     enableInteractive()
     {
-        this.okButton.interactive = true;
-        this.leftArrow.interactive = true;
-        this.rightArrow.interactive = true;    
+        this.setInteractive(true);
     }
 
-    
+    setInteractive(state)
+    {
+        this.okButton.interactive = state;
+        this.leftArrow.interactive = state;
+        this.rightArrow.interactive = state;
+    }
+
     showLeaders(step)
     {
-        let index = this.currentListsIndex + step;
-        if (index > 2)
-            index = 0;
-        else if (index < 0)
-            index = 2;
+        this.currentListsIndex = (this.currentListsIndex + step + 3) % 3;
+        const timePeriods = ["All time", "Month", "Week"];
+        this.timePeriodText.text = timePeriods[this.currentListsIndex];
 
-        this.timePeriodText.text = index === 0 ? "All time" : index === 1 ? "Month" : "Week"; 
-
-        
-        const list = this.lists[index];
-        this.currentListsIndex = index;
-
+        const list = this.lists[this.currentListsIndex];
         this.leadersPlates.forEach(plate => plate.alpha = 0);
 
         for (let i = 0; i < this.leadersPlates.length; i++)
@@ -181,7 +160,7 @@ const list = {
         {"id": "67890", "name": "Alice Johnson", "scores": "49328", "place": "2"},
         {"id": "77889", "name": "Frank Wright", "scores": "38000", "place": "7"}
     ],
-    "montly": [
+    "monthly": [
         {"id": "23456", "name": "Michael Lee", "scores": "1243", "place": "10"},
         {"id": "67890", "name": "Sophia Green", "scores": "1421", "place": "4"},
         {"id": "34567", "name": "Emma White", "scores": "1542", "place": "1"},

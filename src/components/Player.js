@@ -1,7 +1,6 @@
 import { Container, Graphics, Rectangle } from "pixi.js";
 import { MySprite } from "./MySprite";
 import { ScreenSize } from "../Scene";
-import { gsap } from "gsap";
 
 export const PlayerState = {
     Idle: "Idle",
@@ -10,7 +9,12 @@ export const PlayerState = {
     Jump: "Jump",
     Crush: "Crush",
     OnBooster: "OnBooster"
-}
+};
+
+const GRAVITY_DEFAULT = 9;
+const JUMP_WEIGHT = -22.5;
+const BOOSTER_GRAVITY = -30;
+const WEIGHT_INCREMENT = 5;
 
 export class Player extends Container
 {
@@ -23,17 +27,18 @@ export class Player extends Container
         this.img = new MySprite(this, "mi_bunny_idle_03");
         this.img.scale.set(0.7, 0.7);
 
-        this.bounds = new Rectangle(-this.img.width * 0.4, - this.img.width * 0.4, this.img.width * 0.8, this.img.height * 0.8);
+        this.bounds = new Rectangle(-this.img.width * 0.4, -this.img.width * 0.4, this.img.width * 0.8, this.img.height * 0.8);
         this.lowBorder = ScreenSize.Height - 330;
 
-        this.gravity = 9;
+        this.gravity = GRAVITY_DEFAULT;
         this.originalWeight = 2;
-        this.force = 0;
+        this.weight = 0;
 
         this.currentState = PlayerState.OnAir;
         this.isUpdate = true;
 
-        this.lastLoop = new Date();
+        this.distance = 0;
+        this.distanceText = new Text({ text: this.distance.toFixed(0) + 'm', })
     }
 
     onStart()
@@ -45,85 +50,125 @@ export class Player extends Container
 
     setState(state)
     {
-        if (this.state === PlayerState.Crush) return ;
+        if (this.currentState === PlayerState.Crush) return;
 
-        console.log("set state", state);
         this.currentState = state;
-        
+
         switch (this.currentState)
         {
-            case PlayerState.Jump :
-                // gsap.to(this, { y: this.y -= 400, duration: 0.6 });
-                this.weight = -22.5;
-                this.gravity = 0;
+            case PlayerState.Jump:
+                this.setJumpState();
                 break;
-            case PlayerState.Crush :
-                this.position.y = this.lowBorder;
-                this.isUpdate = false;
+            case PlayerState.Crush:
+                this.setCrushState();
                 break;
-            case PlayerState.OnGround :
-                if (this.position.y > this.lowBorder)
-                    this.position.y = this.lowBorder;
+            case PlayerState.OnGround:
+                this.setOnGroundState();
                 break;
-            case PlayerState.OnBooster :
-                // this.weight = -10;
-                this.gravity = -30;
+            case PlayerState.OnBooster:
+                this.setBoosterState();
                 break;
-            case PlayerState.OnAir :
-                this.gravity = 9;
-                this.weight = 0;
+            case PlayerState.OnAir:
+                this.setOnAirState();
                 break;
-            default :
+            default:
                 console.warn("state not defined for player.setState()", this.currentState);
                 break;
         }
     }
 
+    setJumpState()
+    {
+        this.weight = JUMP_WEIGHT;
+        this.gravity = 0;
+    }
+
+    setCrushState()
+    {
+        this.position.y = this.lowBorder;
+        this.isUpdate = false;
+    }
+
+    setOnGroundState()
+    {
+        if (this.position.y > this.lowBorder)
+        {
+            this.position.y = this.lowBorder;
+        }
+    }
+
+    setBoosterState()
+    {
+        this.gravity = BOOSTER_GRAVITY;
+    }
+
+    setOnAirState()
+    {
+        this.gravity = GRAVITY_DEFAULT;
+        this.weight = 0;
+    }
+
     update(deltaTime)
     {
-        if (!this.isUpdate) return ;
+        if (!this.isUpdate) return;
 
-        // console.log("on update", this.currentState);
         switch (this.currentState)
         {
-            case PlayerState.Jump :
-                if (this.weight < 0)
-                    this.weight += deltaTime * 5;
-
-                this.gravity += this.weight * deltaTime;
-                this.position.y += this.gravity * deltaTime;
-
-                if (this.position.y > this.lowBorder)
-                    this.setState(PlayerState.OnGround);
+            case PlayerState.Jump:
+                this.updateJumpState(deltaTime);
                 break;
-
-            case PlayerState.OnAir :
-                this.position.y += this.gravity * deltaTime;
-
-                if (this.position.y > this.lowBorder)
-                    this.setState(PlayerState.OnGround);
+            case PlayerState.OnAir:
+                this.updateOnAirState(deltaTime);
                 break;
-
-            case PlayerState.OnBooster :
-                // if (this.weight < this.originalWeight)
-                //     this.weight += deltaTime;
-
-                // console.log(this.weight);
-                this.gravity += deltaTime;
-                this.position.y += this.gravity * deltaTime;
-
-                if (this.gravity >= 0)
-                    this.setState(PlayerState.OnAir);
+            case PlayerState.OnBooster:
+                this.updateBoosterState(deltaTime);
                 break;
-
-            case PlayerState.OnGround :
+            case PlayerState.OnGround:
                 break;
-            default :
+            case PlayerState.Crush:
+                break;
+            default:
                 console.warn("state not defined for player.update()", this.currentState);
                 break;
         }
     }
     
+    updateJumpState(deltaTime)
+    {
+        if (this.weight < 0)
+        {
+            this.weight += deltaTime * WEIGHT_INCREMENT;
+        }
+        this.gravity += this.weight * deltaTime;
+        this.position.y += this.gravity * deltaTime;
+
+        if (this.position.y > this.lowBorder)
+        {
+            this.setState(PlayerState.OnGround);
+        }
+    }
+
+    updateOnAirState(deltaTime)
+    {
+        this.position.y += this.gravity * deltaTime;
+
+        if (this.position.y > this.lowBorder)
+        {
+            this.setState(PlayerState.OnGround);
+        }
+    }
+
+    updateBoosterState(deltaTime)
+    {
+        this.gravity += deltaTime;
+        this.position.y += this.gravity * deltaTime;
+
+        if (this.gravity >= 0)
+        {
+            this.setState(PlayerState.OnAir);
+        }
+    }
+
     getBounds()
     {
         return new Rectangle(this.x + this.bounds.x, this.y + this.bounds.y, this.bounds.width, this.bounds.height);
@@ -131,9 +176,7 @@ export class Player extends Container
 
     jump()
     {
-        if (this.currentState !== PlayerState.OnGround)
-            return;
-
+        if (this.currentState !== PlayerState.OnGround) return;
         this.setState(PlayerState.Jump);
     }
 

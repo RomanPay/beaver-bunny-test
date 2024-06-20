@@ -15,14 +15,8 @@ export default class Scene extends Container
         this.label = label;
         this.app = app;
 
-        let lastTime = performance.now();
         this.app.ticker.maxFPS = 60;
         this.app.ticker.add(delta => {
-            // const currentTime = performance.now();
-            // const deltaTime = ((currentTime - lastTime) / 1000 ) * 60;
-            console.log(delta.speed);
-            // lastTime = currentTime;
-
             this.update(delta.speed);
         });
 
