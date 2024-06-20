@@ -54,11 +54,18 @@ export class GameScene extends Scene
     initEvents()
     {
         this.on("pointerdown", () => this.onPointerDown());
+        window.addEventListener('keydown', (e) => this.onKeyDown(e));
         eventEmitter.on(EventsList.Pause, () => this.togglePause());
         eventEmitter.on(EventsList.StartGame, () => {
             this.interactive = true;
             this.startGame();
         });
+    }
+
+    onKeyDown(e)
+    {
+        if (e.keyCode === 32)
+            this.onPointerDown();
     }
 
     onPointerDown()
