@@ -122,11 +122,31 @@ export class MainMenuScene extends Scene
 
     initEvents()
     {
-        eventEmitter.on(EventsList.PlayerCrush, () => this.showGameResults());
+        eventEmitter.on(EventsList.PlayerCrush, (distance) => this.showGameResults(distance));
     }
 
-    showGameResults()
+    showGameResults(distance, numCoins = 0)
     {
+        const sessionResult = distance + (numCoins * 5);
+        this.gameSessionText.text = sessionResult.toFixed(0);
+
+        this.distanceText.text = distance.toFixed(0) + " m";
+        const distFromLS = localStorage.getItem("distance");
+        if (distFromLS && distFromLS > distance)
+        {
+            this.rays.alpha = 0;
+            this.stars.forEach(star => star.alpha = 0);
+        }
+        else if (!distance || distFromLS < distance)
+        {
+            this.rays.alpha = 1;
+            this.stars.forEach(star => star.alpha = 1);
+            this.rays.tl.play();
+            this.stars.forEach(star => star.tl.play());
+            localStorage.setItem("distance", sessionResult.toFixed(0));
+            this.youScoreText.text = "Best score:\n" + sessionResult.toFixed(0);
+        }
+        
         gsap.timeline()
             .set(this.baseContainer, { y: -ScreenSize.Height })
             .to(this.baseContainer, { alpha: 1, duration: 0.15 })
@@ -140,7 +160,9 @@ export class MainMenuScene extends Scene
         this.mainMenuContainer = new Container();
         this.baseContainer.addChild(this.mainMenuContainer);
 
-        this.youScoreText = new Text("Best score:\n100", YOU_SCORE_TEXT_STYLE);
+        const distFromLS = localStorage.getItem("distance");
+        const scoreString = distFromLS ?  "Best score:\n" + distFromLS : "Best score:\n0"
+        this.youScoreText = new Text(scoreString, YOU_SCORE_TEXT_STYLE);
         this.youScoreText.anchor.set(0.5, 0);
         this.youScoreText.position.set(this.center.x, this.center.y - 380);
         this.mainMenuContainer.addChild(this.youScoreText);
@@ -278,9 +300,6 @@ export class MainMenuScene extends Scene
     showGameResultsScreen()
     {
         this.leadersLists.disableInteractive();
-        this.rays.alpha = 1;
-        this.rays.tl.play();
-        this.stars.forEach(star => star.tl.play());
         this.leaderboardButton.interactive = false;
         this.playButton.interactive = false;
         this.mainMenuContainer.alpha = 0;

@@ -1,4 +1,4 @@
-import { Container, Graphics, Rectangle } from "pixi.js";
+import { Container, Graphics, Rectangle,Text } from "pixi.js";
 import { MySprite } from "./MySprite";
 import { ScreenSize } from "../Scene";
 
@@ -15,6 +15,7 @@ const GRAVITY_DEFAULT = 9;
 const JUMP_WEIGHT = -22.5;
 const BOOSTER_GRAVITY = -30;
 const WEIGHT_INCREMENT = 5;
+const PLAYER_CRUISE_SPEED = 30;
 
 export class Player extends Container
 {
@@ -38,20 +39,23 @@ export class Player extends Container
         this.isUpdate = true;
 
         this.distance = 0;
-        this.distanceText = new Text({ text: this.distance.toFixed(0) + 'm', })
+        this.distanceText = new Text({ text: this.distance.toFixed(0) + 'm', style: { fontFamily: "ZubiloBlack", fontSize: 40, fill: 0x000000, align: "center" } });
+        this.distanceText.anchor.set(0.5, 0.5);
+        this.distanceText.y = this.img.height * 0.5;
+        this.addChild(this.distanceText);
     }
 
     onStart()
     {
         this.position.y = this.lowBorder;
         this.isUpdate = false;
+        this.distance = 0;
+        this.distanceText.text = this.distance.toFixed(0) + "m";
         this.setState(PlayerState.OnAir);
     }
 
     setState(state)
     {
-        if (this.currentState === PlayerState.Crush) return;
-
         this.currentState = state;
 
         switch (this.currentState)
@@ -131,6 +135,18 @@ export class Player extends Container
                 console.warn("state not defined for player.update()", this.currentState);
                 break;
         }
+
+        this.updateDistance(deltaTime);
+    }
+
+    updateDistance(deltaTime)
+    {
+        if (this.isUpdate)
+        {
+            this.distance += deltaTime / PLAYER_CRUISE_SPEED;
+            this.distanceText.text = this.distance.toFixed(0) + 'm';   
+        }
+
     }
     
     updateJumpState(deltaTime)

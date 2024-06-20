@@ -16,7 +16,7 @@ const START_SLOPE_Y_OFFSET = 314;
 const GROUND_HEIGHT = 414;
 const MOUNTAINS_HEIGHT = 770;
 const TREE_PROBABILITY = 0.005;
-const OBSTACLE_PROBABILITY = 0.004;
+const OBSTACLE_PROBABILITY = 0.01;
 
 export class GameScene extends Scene
 {
@@ -100,6 +100,8 @@ export class GameScene extends Scene
             ch.active = false;
             ch.img.texture = new Texture.from(ch.idleKey);
         });
+
+        this.numActiveObstacles = 0;
     }
 
     onCrush(obstacle)
@@ -108,7 +110,7 @@ export class GameScene extends Scene
         this.player.crush();
         this.isUpdate = false;
         this.playerSpeed = 0;
-        eventEmitter.emit(EventsList.PlayerCrush);
+        eventEmitter.emit(EventsList.PlayerCrush, this.player.distance);
     }
 
     togglePause()
@@ -170,6 +172,7 @@ export class GameScene extends Scene
 
     initObstacles()
     {
+        this.numActiveObstacles = 0;
         this.obstacles = Array.from({ length: 4 }, () => new Obstacle(this.levelContainer));
     }
 
@@ -206,15 +209,22 @@ export class GameScene extends Scene
 
     updateObstacles(deltaTime)
     {
-        if (Math.random() < OBSTACLE_PROBABILITY)
+        if (Math.random() < OBSTACLE_PROBABILITY && this.playerSpeed > 0)
         {
+            console.log("OBSTACLE_PROBABILITY / (this.numActiveObstacles + 1)",  OBSTACLE_PROBABILITY / (this.numActiveObstacles + 1));
             const obstacle = this.obstacles.find(ch => !ch.active);
-            if (obstacle) obstacle.setOnStart(this.levelWidth);
+            if (obstacle)
+            {
+                obstacle.setOnStart(this.levelWidth);
+            }
         }
 
         this.obstacles.forEach(ch => {
             if (ch.active) ch.x -= deltaTime * this.playerSpeed;
-            if (ch.x + ch.width < 0) ch.active = false;
+            if (ch.x + ch.width < 0) 
+            {
+                ch.active = false;
+            }
         });
     }
 
